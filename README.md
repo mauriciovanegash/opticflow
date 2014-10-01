@@ -1,7 +1,7 @@
 opticflow
 =========
 
-This repository contains code for estimating optic flow by using a Nvidia GPU. It is a modification of the example provided by CUDA library in which is implemented the model of Horn & Schunck.
+This repository contains code for estimating optic flow by using a Nvidia GPU. It is a modification of the example provided by CUDA library in which is implemented the model of Horn & Schunck. Hence, this software contains source code provided by NVIDIA Corporation.
 
 The code has been tested in OpenSUSE 13.1 and Ubuntu 14.04 with Nvidia GPU's with compute capabilities 2.1. However, I am confident this piece of code can be executed in other linux distributions without problems. In order to compile the code provided, you need to be sure that OpenCV 2.4 and CUDA 6.0 or later are installed in your system.
 
