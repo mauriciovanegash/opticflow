@@ -24,6 +24,14 @@ LIBS = -pthread $(shell pkg-config --libs opencv)
 The Makefile provided can manage authomatically all the development files (.cpp, .c, .cu, .cuh) present in the SRC folder. In case you want to use a complementary source folder, you can add it by modifying:
 DIRECTORIES = src
 
+After all the above changes you just need:
+
+$ make -j4 all
+$ ./opticflow
+
+In case you are running a system with a discrete card. I recommend to use the project Bumblebee. In this case:
+$ optirun ./opticflow
+
 LINKS OF INTEREST
 
 To those who wants to start with developing in CUDA, I invite them to check this link:
