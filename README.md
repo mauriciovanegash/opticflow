@@ -26,6 +26,7 @@ CXXFLAGS :=	${CXXFLAGS} ${DEFS} $(shell pkg-config --cflags opencv)
 LIBS = -pthread $(shell pkg-config --libs opencv) 
 
 The Makefile provided can manage authomatically all the development files (.cpp, .c, .cu, .cuh) present in the SRC folder. In case you want to use a complementary source folder, you can add it by modifying:
+
 DIRECTORIES = src
 
 After all the above changes you just need:
