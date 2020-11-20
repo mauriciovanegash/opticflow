@@ -28,7 +28,7 @@ int cuDistortion(int iw, int ih, float *dx, float *dy)
 
     // Execute the kernel
     distortion_kernel<<<blocks,threads>>>(iw, ih, is, dev_dx, dev_dy);
-    int error = checkCudaErrors(cudaThreadSynchronize());
+    int error = checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -44,7 +44,7 @@ int cuCartToPolar(int iw, int ih, float *dx, float *dy, int px, int py)
 
     // Execute the kernel
     cart2polar_kernel<<<blocks,threads>>>(iw, ih, is, dev_dx, dev_dy, px, py);
-    int error = checkCudaErrors(cudaThreadSynchronize());
+    int error = checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -60,7 +60,7 @@ int cuPolarToCart(int iw, int ih, float *dx, float *dy, int px, int py)
 
     // Execute the kernel
     polar2cart_kernel<<<blocks,threads>>>(iw, ih, is, dev_dx, dev_dy, px, py);
-    int error = checkCudaErrors(cudaThreadSynchronize());
+    int error = checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -76,7 +76,7 @@ int cuVectorAdd(float *vec1, float *vec2, int length, float *sum)
     dim3 blocks(iDivUp(length, threads.x));
 
     add_kernel<<<blocks, threads>>>(dev_vec1, dev_vec2, length, sum);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -101,7 +101,7 @@ int cuJacobiSolver(float *u0, float *v0, float *du0, float *dv0, float *Ix, floa
 
     JacobiIteration<32,6><<<blocks, threads>>>(dev_u0, dev_v0, dev_du0, dev_dv0, Ix, Iy, Iz, iw, ih, is, omega,
     											alpha, dev_du1, dev_dv1);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -215,7 +215,7 @@ int cuWarpingText(int iw, int ih, float *source, float *dest, float *dx, float *
 
     // Execute the kernel
     warping_text_Kernel<<<blocks, threads>>>(iw, ih, is, dx, dy, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
@@ -265,7 +265,7 @@ int cuUpScaleTexture(int iw, int ih, float scale, float *source, float *dest)
     error += checkCudaErrors(cudaBindTexture2D(0, texCoarse, dev_source, iw, ih, os * sizeof(float)));
 
     upscale_text_kernel<<<blocks, threads>>>(iw*2, ih*2, is, scale, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }

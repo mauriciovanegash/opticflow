@@ -19,7 +19,6 @@
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
 #include <device_launch_parameters.h>
-#include <math_functions.h>
 
 #define checkCudaErrors(val)	cuCheck( (val), #val, __FILE__, __LINE__ )
 #define DEVICE_RESET 			cudaDeviceReset();
@@ -1640,7 +1639,7 @@ inline cudaError_t cuGetPointer(void **dev_ptr, T *ptr)
 	cudaError_t error = cudaSuccess;
 
 	cudaPointerGetAttributes(&ptrAttributes,ptr);
-	if(ptrAttributes.memoryType == cudaMemoryTypeDevice)
+	if(ptrAttributes.type == cudaMemoryTypeDevice)
 		*dev_ptr = ptr;
 	else
 		error = cudaHostGetDevicePointer(dev_ptr, (void*)ptr, 0);
@@ -1658,7 +1657,7 @@ int cuGPUMemsetPrototype(size_t size, T *ptr, T value)
     int numBlocks = (size + blockSize - 1) / size;
 
     memset_kernel<T><<<numBlocks, blockSize>>>(size,dev_ptr,value);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
@@ -1676,7 +1675,7 @@ int cuCopyGPUtoHostPrototype(int iw, int ih, float *source, T *dest)
     dim3 blocks(iDivUp(iw, threads.x), iDivUp(ih, threads.y));
 
     copyGPUtoHost_kernel<T><<<blocks, threads>>>(iw, ih, is, dev_source, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
@@ -1695,7 +1694,7 @@ int cuCopyHostToGPUPrototype(int iw, int ih, T *source, float *dest, float facto
     dim3 blocks(iDivUp(iw, threads.x), iDivUp(ih, threads.y));
 
     copyHostToGPU_kernel<T><<<blocks, threads>>>(iw, ih, is, dev_source, dev_dest, factor);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
@@ -1714,7 +1713,7 @@ int cuBoxFilterPrototype(int iw, int ih, T *source, T *dest, int bw, int bh)
 
     // Execute the kernel
     boxfilter_kernel<T><<<blocks,threads>>>(iw, ih, is, dev_source, dev_dest, bw, bh);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -1733,7 +1732,7 @@ int cuSobelFilterPrototype(int iw, int ih, T *source, T *dest)
 
     // Execute the kernel
     sobelfilter_kernel<T><<<blocks,threads>>>(iw, ih, is, dev_source, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -1776,7 +1775,7 @@ int cuImageDerivativePrototype(int iw, int ih, T *source, T *target, T *Ix, T *I
 			derivative_kernel<T><<<blocks,threads>>>(iw, ih, is, dev_source, dev_target, dev_Ix, dev_Iy, dev_Iz, 12, 1, -8, 0, 8, -1);
 			break;
 	}
-	error += checkCudaErrors(cudaThreadSynchronize());
+	error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -1809,7 +1808,7 @@ int cuImageDerivativeExtendedPrototype(int iw, int ih, T *source, T *target,
 													  dev_Ixx, dev_Iyy, dev_Ixy, dev_Ixz, dev_Iyz,
 													  12, 1, -8, 0, 8, -1,
 													  12, -1, 16, -30, 16, -1);
-	error += checkCudaErrors(cudaThreadSynchronize());
+	error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -1828,7 +1827,7 @@ int cuWarpingPrototype(int iw, int ih, T *source, T *dest, float *dx, float *dy,
 
     // Execute the kernel
     warping_kernel<T><<<blocks,threads>>>(iw, ih, is, dev_source, dev_dest, dx, dy, isTotalDisp);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
     return error;
 }
@@ -1847,7 +1846,7 @@ int cuDownScalePrototype(int iw, int ih, T *source, T *dest)
     dim3 blocks(iDivUp(iw, threads.x), iDivUp(ih, threads.y));
 
     downscale_kernel<T><<<blocks, threads>>>(iw, ih, is, os, dev_source, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
@@ -1866,7 +1865,7 @@ int cuUpScalePrototype(int iw, int ih, float scale, T *source, T *dest)
     dim3 blocks(iDivUp(iw*2, threads.x), iDivUp(ih*2, threads.y));
 
     upscale_kernel<T><<<blocks, threads>>>(iw*2, ih*2, is, os, scale, dev_source, dev_dest);
-    error += checkCudaErrors(cudaThreadSynchronize());
+    error += checkCudaErrors(cudaDeviceSynchronize());
 
 	return error;
 }
