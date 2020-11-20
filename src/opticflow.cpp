@@ -246,8 +246,7 @@ int main(void)
 		cv::imshow("Old Frame", imageT0);
 		cv::imshow("Optical Flow", bgr);
 
-		int c = cvWaitKey(10);
-		if (27 == char(c))
+		if (cvWaitKey(10) >= 0)
 			break;
 	}
 
