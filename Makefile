@@ -29,8 +29,8 @@ ifeq (YES, ${PROFILE})
 endif
 #****************************************************************************
 # Preprocessor directives
-#**************************************************************************** 
-DEFS = 
+#****************************************************************************
+DEFS =
 #DEFS += -DSHOWINGWARNINGS
 #DEFS += -DSHOWINGINFO
 #DEFS += -DRAPIDXML_NO_EXCEPTIONS
@@ -38,7 +38,7 @@ DEFS =
 #DEFS += -DSAVE_TRANSVEL_PROFILE
 
 CUDEFS =
-CUDEFS += -DCUDA_TOOLKIT_6
+CUDEFS += -DCUDA_TOOLKIT_10
 
 ARCH := $(shell uname -m)
 CXX = g++
@@ -46,22 +46,22 @@ CC = gcc
 
 CXXFLAGS :=	${CXXFLAGS} ${DEFS} $(shell pkg-config --cflags opencv)
 
-LIBS = -pthread $(shell pkg-config --libs opencv) 
+LIBS = -pthread $(shell pkg-config --libs opencv)
 
 #****************************************************************************
 # CUDA GPU directives
-#**************************************************************************** 
-NVCC ?= nvcc
-CUDA_INSTALL_PATH = /usr/local/cuda-6.0
+#****************************************************************************
+CUDA_INSTALL_PATH = /usr/local/cuda
+NVCC ?= $(CUDA_INSTALL_PATH)/bin/nvcc
 CUDA_INCL := -I"$(CUDA_INSTALL_PATH)/include"
 
 ifeq "$(ARCH)" "x86_64"
-CUDALIBS += -L"$(CUDA_INSTALL_PATH)/lib64" -lcuda -lcudart -lcublas -lcufft 
+CUDALIBS += -L"$(CUDA_INSTALL_PATH)/lib64" -lcuda -lcudart -lcublas -lcufft
 else
-CUDALIBS += -L"$(CUDA_INSTALL_PATH)/lib" -lcuda -lcudart -lcublas -lcufft 
+CUDALIBS += -L"$(CUDA_INSTALL_PATH)/lib" -lcuda -lcudart -lcublas -lcufft
 endif
 
-NVCCFLAGS := --compiler-options -fPIC -arch=sm_20 -m64 $(CUDEFS) --ptxas-options=-v -O3 -G -g
+NVCCFLAGS := --compiler-options -fPIC --gpu-architecture=compute_53 --gpu-code=sm_53 $(CUDEFS) --ptxas-options=-v -O3 -G -g
 
 #****************************************************************************
 # Directories
@@ -70,7 +70,7 @@ DIRECTORIES = src
 
 # Add directories to the include and library paths
 INCPATH = $(DIRECTORIES)
-LIBPATH = 
+LIBPATH =
 
 # Which files to add to backups, apart from the source code
 EXTRA_FILES = Makefile
@@ -106,21 +106,21 @@ $(TARGET): dirs $(OBJECTS)
 
 $(STORE)/%.o: %.cpp
 	@echo 'Building partial codes: $^'
-	$(CXX) -Wp,-MMD,$(STORE)/$*.dd $(CXXFLAGS) $(foreach INC,$(INCPATH),-I$(INC)) -c $^ -o $@ 
+	$(CXX) -Wp,-MMD,$(STORE)/$*.dd $(CXXFLAGS) $(foreach INC,$(INCPATH),-I$(INC)) -c $^ -o $@
 	@sed -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(STORE)/$*.dd > $(STORE)/$*.d
 	@echo ' '
-	
+
 $(STORE)/%.o: %.c
 	@echo 'Building partial codes: $^'
-	$(CXX) -Wp,-MMD,$(STORE)/$*.dd $(CXXFLAGS) $(foreach INC,$(INCPATH),-I$(INC)) -c $^ -o $@ 
+	$(CXX) -Wp,-MMD,$(STORE)/$*.dd $(CXXFLAGS) $(foreach INC,$(INCPATH),-I$(INC)) -c $^ -o $@
 	@sed -e '1s/^\(.*\)$$/$(subst /,\/,$(dir $@))\1/' $(STORE)/$*.dd > $(STORE)/$*.d
 	@echo ' '
-	
+
 $(STORE)/%.cu_o: %.cu
 	@echo 'Building partial codes: $^'
-	$(NVCC) $(NVCCFLAGS) $(CUDA_INCL) -c $^ -o $@ 
+	$(NVCC) $(NVCCFLAGS) $(CUDA_INCL) -c $^ -o $@
 	@echo ' '
-	
+
 # Empty rule to prevent problems when a header is deleted.
 %.hpp: ;
 
